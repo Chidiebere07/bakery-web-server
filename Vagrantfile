@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.56.22"
+  config.vm.network "private_network", ip: "192.168.56.28"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -70,8 +70,17 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
+  config.vm.provision "shell", inline: <<-SHELL
+    yum install httpd wget unzip vim -y
+    systemctl start httpd
+    systemctl enable httpd
+    mkdir -p /tmp/bakery
+    cd /tmp/bakery
+    wget https://www.tooplate.com/zip-templates/2168_sweet_bakery.zip
+    unzip -o 2168_sweet_bakery.zip
+    cp -r 2168_sweet_bakery/* /var/www/html/
+    systemctl restart httpd
+    cd /tmp
+    rm -rf /tmp/bakery
+  SHELL
 end
